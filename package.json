@@ -17,6 +17,7 @@
     "@react-navigation/native": "^7.1.6",
     "cannon-es": "^0.20.0",
     "expo": "~53.0.10",
+    "expo-asset": "^11.1.5",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
     "expo-font": "~13.3.1",
@@ -47,7 +48,8 @@
     "@types/three": "^0.177.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "canvas": "^3.1.0"
   },
   "private": true
 }

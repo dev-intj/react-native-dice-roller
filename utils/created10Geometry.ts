@@ -1,19 +1,22 @@
 import { THREE } from "expo-three";
 
-export const createD10Geometry = (): THREE.PolyhedronGeometry => {
+export const createD10Geometry = (): THREE.BufferGeometry  => {
   const sides = 10;
   const radius = 1;
 
   const baseVertices = [
-    [0, 0, 1],
-    [0, 0, -1],
+    [0, 0, 1], // top point
+    [0, 0, -1], // bottom point
   ];
+
   for (let i = 0; i < sides; ++i) {
     const b = (i * Math.PI * 2) / sides;
-    baseVertices.push([-Math.cos(b), -Math.sin(b), 0.105 * (i % 2 ? 1 : -1)]);
+    baseVertices.push([
+      -Math.cos(b),
+      -Math.sin(b),
+      0.105 * (i % 2 === 1 ? 1 : -1),
+    ]);
   }
-
-  const vertices = baseVertices.map((v) => new THREE.Vector3(...v));
 
   const faces = [
     [0, 2, 3],
@@ -38,8 +41,47 @@ export const createD10Geometry = (): THREE.PolyhedronGeometry => {
     [1, 2, 11],
   ];
 
-  const flatVertices = vertices.map((v) => v.toArray()).flat();
-  const flatFaces = faces.flat();
+  const positions: number[] = [];
+  const indices: number[] = [];
+  const uvs: number[] = [];
 
-  return new THREE.PolyhedronGeometry(flatVertices, flatFaces, radius, 0);
+  const cols = 5;
+  const rows = 4;
+
+  const vertices = baseVertices.map((v) => new THREE.Vector3(...v));
+
+  for (let i = 0; i < faces.length; i++) {
+    const face = faces[i];
+    const baseIndex = positions.length / 3;
+
+    // Push vertex positions
+    for (let j = 0; j < 3; j++) {
+      const v = vertices[face[j]];
+      positions.push(v.x, v.y, v.z);
+    }
+
+    indices.push(baseIndex, baseIndex + 1, baseIndex + 2);
+
+    // UV mapping
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const uMin = col / cols;
+    const uMax = (col + 1) / cols;
+    const vMin = 1 - (row + 1) / rows;
+    const vMax = 1 - row / rows;
+
+    // Triangle fills whole tile
+    uvs.push(uMin, vMax, (uMin + uMax) / 2, vMin, uMax, vMax);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3)
+  );
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+
+  return geometry;
 };

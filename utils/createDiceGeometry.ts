@@ -1,23 +1,30 @@
 import { THREE } from "expo-three";
 
-import { createD10Geometry } from "./created10Geometry";
-
 import { DiceType } from "@/types";
+
+import {
+  createBoxWithUVs,
+  createD12GeometryWithUVs,
+  createD20GeometryWithUVs,
+  createTetrahedronWithUVs,
+} from "./generateUVs";
+
+import { createD10Geometry } from "./created10Geometry";
 
 export const createDiceGeometry = (sides: DiceType): THREE.BufferGeometry => {
   switch (sides) {
     case 4:
-      return new THREE.TetrahedronGeometry(1);
+      return createTetrahedronWithUVs();
     case 6:
-      return new THREE.BoxGeometry(2, 2, 2);
+      return createBoxWithUVs();
     case 8:
       return new THREE.OctahedronGeometry(1);
     case 10:
       return createD10Geometry();
     case 12:
-      return new THREE.DodecahedronGeometry(1);
+      return createD12GeometryWithUVs();
     case 20:
     default:
-      return new THREE.IcosahedronGeometry(1);
+      return createD20GeometryWithUVs();
   }
 };
